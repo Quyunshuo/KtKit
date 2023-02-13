@@ -1,15 +1,21 @@
 package com.hi.dhl.demo.ktkit
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.hi.dhl.binding.viewbind
 import com.hi.dhl.demo.ktkit.databinding.ActivityMainBinding
 import com.hi.dhl.demo.ktkit.login.LoginActivity
+import com.hi.dhl.demo.ktkit.model.PeopleModel
+import com.hi.dhl.ktkit.common.*
 import com.hi.dhl.ktkit.core.*
 import com.hi.dhl.ktkit.ui.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +36,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         initView()
+
+        var json = PeopleModel("dhl").toJson()
+        Log.e(TAG, "json = $json  md5 = ${json.md5()}")
+
+        val model = json.fromJson<PeopleModel>()
+        Log.e(TAG, "model = $model")
+
+        json = PeopleModel("dhl").toJson(true)
+        Log.e(TAG, "json = $json")
+
+        testNetwork()
+    }
+
+    private fun testNetwork() {
+        Log.e(TAG, "hasNetwork = ${hasNetwork()}")
+        Log.e(TAG, "getNetworkType = ${getNetworkType()}")
+        Log.e(TAG, "connectedToWifi = ${isConnectedToWifi()}")
+        Log.e(TAG, "connectedToBluetooth = ${isConnectedToBluetooth()}")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Log.e(TAG, "getBandwidthKbps = ${getBandwidthKbps()}")
+        }
+        lifecycleScope.launch {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                bindFastNetWorkWithWifi().collect {
+                    Log.e(TAG, "listenNetwork = $it")
+                }
+            }
+        }
     }
 
     private fun initView() {
@@ -43,6 +77,25 @@ class MainActivity : AppCompatActivity() {
 
             imgScreen.setBackgroundColor(color(R.color.purple_500))
             imgScreen.setImageDrawable(drawable(R.drawable.ic_launcher_foreground))
+
+            editext.setRoundRectBg(color(R.color.purple_500), 30f)
+            editext.textChange(
+                lifecycle = lifecycleScope
+            ) {
+                Log.e(TAG, "textChange = $it")
+            }
+
+            editext.textChangeWithbefore(
+                lifecycle = lifecycleScope
+            ) {
+                Log.e(TAG, "textChangeWithbefore = $it")
+            }
+
+            editext.textChangeWithAfter(
+                lifecycle = lifecycleScope
+            ) {
+                Log.e(TAG, "textChangeWithAfter = $it")
+            }
         }
     }
 
@@ -82,5 +135,9 @@ class MainActivity : AppCompatActivity() {
             val userName = data?.getStringExtra(ProfileActivity.KEY_USER_NAME)
             binding.tvActResult.setText("$result - $userName")
         }
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

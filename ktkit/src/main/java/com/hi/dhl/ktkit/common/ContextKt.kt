@@ -4,8 +4,6 @@ package com.hi.dhl.ktkit.core
 
 import android.app.Activity
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkInfo
 import android.os.Build
 import android.view.WindowManager
 import android.widget.Toast
@@ -63,19 +61,6 @@ inline fun Context.dp2px(value: Int): Int = (density * value).toInt()
 // px to dp
 @kotlin.internal.InlineOnly
 inline fun Context.px2dp(value: Int): Float = value.toFloat() / density
-
-/**
- * 网络检查
- */
-@kotlin.internal.InlineOnly
-inline fun Context.hasNetwork(): Boolean? {
-    var isConnected: Boolean? = false // Initial Value
-    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-    if (activeNetwork != null && activeNetwork.isConnected)
-        isConnected = true
-    return isConnected
-}
 
 /**
  * 设置状态栏的颜色
